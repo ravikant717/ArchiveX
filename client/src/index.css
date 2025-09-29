@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+
+@font-face {
+  font-family: Gojo;
+  src: url("../public/fonts/font.woff2");
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg text-white;
+  }
+}
+
+@theme {
+  --font-gojo: Gojo, "sans-serif";
+}
