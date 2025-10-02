@@ -1,12 +1,14 @@
 import React from 'react'
-import { useAuthStore } from '../store/authStore';
 import HomeScreen from '../components/HomeScreen';
 import Login from '../components/Login';
+import Navbar from '../components/Navbar/Navbar';
 
 const HomePage = () => {
-    const {user} = useAuthStore();
     return (
-    <div>{user ? <HomeScreen/> : <Login/>}</div>
+    <div className='bg-amber-50 h-screen'>
+      
+      <Navbar/>
+      <HomeScreen/></div>
   )
 }
 
