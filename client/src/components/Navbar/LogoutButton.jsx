@@ -7,7 +7,7 @@ const LogoutButton = () => {
   
     return (
     
-            <button onClick={logout} className=''> 
+            <button onClick={logout} className='cursor-pointer'> 
             <IoMdLogOut className='text-2xl text-green-700'/>
             </button>  )
 }
