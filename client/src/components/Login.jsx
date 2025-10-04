@@ -2,14 +2,17 @@ import React from 'react'
 import { useState } from 'react';
 import { Link } from 'react-router'
 import { useAuthStore } from '../store/authStore';
+import { useNavigate } from 'react-router';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useAuthStore();
+  const navigate = useNavigate();
   const handleLogin = (e) => {
     e.preventDefault();
     login({ email, password });
+    navigate('/dashboard');
   }
   return (
     <div className='flex items-center justify-center h-screen bg-cover bg-center'>

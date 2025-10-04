@@ -66,6 +66,8 @@ export const useAuthStore = create((set) => ({
         error.response.data.message || "Authentication check failed",
         { id: "auth-check-error" }
       );
+    } finally {
+      set({ isCheckingAuth: false });
     }
   },
 }));

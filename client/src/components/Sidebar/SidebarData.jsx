@@ -12,17 +12,17 @@ export const SidebarData = [
   {
     title: "Academic",
     icon: <HiMiniAcademicCap className="size-6"/>,
-    link: "/files",
+    link: "/dashboard/academic",
   },
     {
     title: "Career",
     icon: <MdWorkOutline className="size-6"/>,
-    link: "/files",
+    link: "/dashboard/career",
   },
     {
     title: "Personal",
     icon: <RiGitRepositoryPrivateFill className="size-6"/>,
-    link: "/files",
+    link: "/dashboard/personal",
   },
 
 ];

@@ -1,15 +1,19 @@
 import React from 'react'
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
+import { useNavigate } from 'react-router';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const {signup} = useAuthStore();
+  const navigate = useNavigate();
   const handleSignUp = (e) => {
     e.preventDefault();
     signup({ email, password, username });
+    navigate('/dashboard');
+
   }
   return (
     <div className='flex items-center justify-center h-screen bg-cover bg-center'>
