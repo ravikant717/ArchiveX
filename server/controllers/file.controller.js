@@ -6,10 +6,17 @@ export const uploadFile = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
+    const originalName = req.file.originalname;
+    //Unique Name for cloudinary origin
+    const baseName = originalName
+      .replace(/\.[^/.]+$/, "")
+      .replace(/\s+/g, "_")
+      .replace(/[^\w-]/g, "");
+    const publicId = `${Date.now()}_${baseName}`;
     const cloudinaryUpload = (fileBuffer) => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
-          { resource_type: "auto" },
+          { resource_type: "auto", public_id: publicId },
           (error, result) => {
             if (error) reject(error);
             else resolve(result);
@@ -21,9 +28,10 @@ export const uploadFile = async (req, res) => {
     const result = await cloudinaryUpload(req.file.buffer);
     const newFile = new File({
       userId: req.user._id,
-      filename: req.file.originalname,
+      filename: originalName,
       uploadedAt: Date.now(),
       url: result.secure_url,
+      publicId: result.public_id,
     });
     await newFile.save();
     return res
@@ -37,9 +45,11 @@ export const uploadFile = async (req, res) => {
 
 export const getFilesForUser = async (req, res) => {
   try {
-    const files = await File.find({ userId: req.user._id }).sort({
-      uploadedAt: -1,
-    });
+    const files = await File.find({ userId: req.user._id })
+      .sort({
+        uploadedAt: -1,
+      })
+      .lean();
     return res.status(200).json({ files });
   } catch (err) {
     console.error("Error in getFilesForUser controller: " + err.message);

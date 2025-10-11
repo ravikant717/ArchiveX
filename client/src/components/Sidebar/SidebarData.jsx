@@ -10,9 +10,9 @@ export const SidebarData = [
     link: "/dashboard",
   },
   {
-    title: "Academic",
+    title: "Files",
     icon: <HiMiniAcademicCap className="size-6"/>,
-    link: "/dashboard/academic",
+    link: "/dashboard/files",
   },
     {
     title: "Career",

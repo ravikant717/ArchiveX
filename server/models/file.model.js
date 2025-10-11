@@ -18,6 +18,10 @@ const fileSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  publicId: {
+    type: String,
+    required: true,
+  },
 });
 
 export const File = mongoose.model("File", fileSchema);

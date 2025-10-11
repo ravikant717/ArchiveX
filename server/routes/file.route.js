@@ -5,5 +5,5 @@ import { protectRoute } from "../middleware/protectRoute.js";
 const router = express.Router();
 
 router.post("/upload", protectRoute, upload.single("file"), uploadFile);
-router.get("/files", protectRoute, getFilesForUser);
+router.get("/my-files", protectRoute, getFilesForUser);
 export default router;
