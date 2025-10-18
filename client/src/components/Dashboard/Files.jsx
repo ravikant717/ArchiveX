@@ -1,11 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useFileStore } from "../../store/fileStore";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
+import FileMenu from "./FileMenu";
 
 const Files = () => {
-  const { files, fetching, error, fetchFiles } = useFileStore();
-
+  const { files, fetching, error, fetchFiles} = useFileStore();
+  const [openMenu, setOpenMenu] = useState(null);
   useEffect(() => {
     fetchFiles();
   }, [fetchFiles]);
@@ -24,7 +25,20 @@ const Files = () => {
               className="w-full h-40 object-cover rounded-lg cursor-pointer"
             />
           </Zoom>
-          <p className="mt-2 text-center font-medium">{file.filename}</p>
+          <div className="flex relative items-center mt-2">
+            <p className="w-[90%] text-center font-medium">{file.filename}</p>
+            <div className="absolute right-0">
+              <button
+                className="text-xl font-bold cursor-pointer"
+                onClick={() => setOpenMenu(openMenu === file._id ? null: file._id)}
+              >
+                ⋯
+              </button>
+            </div>
+            {openMenu === file._id && (
+              <FileMenu name={file.filename} id={file._id} closed={setOpenMenu}/>
+            )}
+          </div>
         </div>
       ))}
     </div>

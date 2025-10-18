@@ -35,11 +35,13 @@ export const useAuthStore = create((set) => ({
         isAuthenticated: true,
       });
       toast.success("Login successful", { id: "login-success" });
+      return true;
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed", {
         id: "login-error",
       });
       set({ isLoggingIn: false, user: null });
+      return false;
     }
   },
   logout: async () => {

@@ -7,13 +7,18 @@ import { useNavigate } from 'react-router';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useAuthStore();
-  const navigate = useNavigate();
-  const handleLogin = (e) => {
-    e.preventDefault();
-    login({ email, password });
-    navigate('/dashboard');
+    const navigate = useNavigate();
+    const { login } = useAuthStore();
+  
+
+const handleLogin = async (e) => {
+  e.preventDefault();
+  const success = await login({ email, password }); 
+  if (success) {
+    navigate('/dashboard'); 
   }
+};
+
   return (
     <div className='flex items-center justify-center h-screen bg-cover bg-center'>
       <div className='p-8 glass w-full max-w-sm'>
