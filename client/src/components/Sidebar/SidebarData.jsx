@@ -15,9 +15,9 @@ export const SidebarData = [
     link: "/dashboard/files",
   },
     {
-    title: "Career",
+    title: "Lab",
     icon: <MdWorkOutline className="size-6"/>,
-    link: "/dashboard/career",
+    link: "/dashboard/labs",
   },
     {
     title: "Personal",

@@ -5,7 +5,7 @@ import SignedInUser from "./SignedInUser";
 const Sidebar = () => {
   //TODO: Fetch the real user data into signed in user
   return (
-    <div className="flex flex-col  h-screen "> 
+    <div className="flex flex-col border-r-2 h-screen "> 
     <SidebarItems/>
     <SidebarBottomLogo/>
     <SignedInUser/>

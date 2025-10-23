@@ -19,8 +19,10 @@
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "libreoffice": "^0.4.5",
     "mongoose": "^8.18.2",
     "multer": "^2.0.2",
+    "pdf-lib": "^1.17.1",
     "streamifier": "^0.1.1"
   },
   "devDependencies": {

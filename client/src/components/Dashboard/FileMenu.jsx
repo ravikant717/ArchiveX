@@ -4,7 +4,7 @@ import RenameMenu from './RenameMenu';
 
 const FileMenu = ({id, name, closed}) => {
 
-    const {downloadFile} = useFileStore();
+  const {downloadFile} = useFileStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
     

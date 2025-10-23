@@ -9,6 +9,7 @@ import { useAuthStore } from './store/authStore'
 import { useEffect } from 'react'
 import GifLoader from './components/GifLoader'
 import Files from './components/Dashboard/Files'
+import Labs from './components/Dashboard/Labs'
 
 const App = () => {
   const {user, isCheckingAuth, authCheck} = useAuthStore();
@@ -31,6 +32,7 @@ const App = () => {
           <Route path="/dashboard" element={user ? <HomePage />: <Navigate to="/login"/>}>
             <Route index element={<HomeScreen />} />
             <Route path="files" element={<Files />} />
+            <Route path="labs" element={<Labs />} />
           </Route>
         <Route path ="/" element={<Navigate to ="/dashboard"/>}/>
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" replace />} 
