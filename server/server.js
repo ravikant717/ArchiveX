@@ -13,7 +13,6 @@ app.use(express.json()); // Middleware to parse JSON bodies
 app.use(cookieParser()); // Middleware to parse cookies
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/file", fileRoutes);
-app.use("/api/v1/lab", labRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
