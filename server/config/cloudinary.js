@@ -2,6 +2,8 @@ import { v2 as cloudinary } from "cloudinary";
 
 import { ENV_VARS } from "./envVars.js";
 
+
+//Config keys for connecting to cloudinary 
 cloudinary.config({
   cloud_name: ENV_VARS.CLOUDINARY_CLOUD_NAME,
   api_key: ENV_VARS.CLOUDINARY_API_KEY,

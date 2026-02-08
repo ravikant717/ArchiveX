@@ -1,6 +1,8 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { generateTokenAndSetCookie } from "../utils/generateToken.js";
+
+//SIGNUP CONTROLLER
 export async function signup(req, res) {
   try {
     const { email, password, username } = req.body;
@@ -13,19 +15,23 @@ export async function signup(req, res) {
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Invalid email format" });
     }
+
     if (password.length < 6) {
       return res
         .status(400)
         .json({ message: "Password must be at least 6 characters long" });
     }
+
     const existingUserByEmail = await User.findOne({ email });
     if (existingUserByEmail) {
       return res.status(400).json({ message: "Email is already in use" });
     }
+
     const existingUserByUsername = await User.findOne({ username });
     if (existingUserByUsername) {
       return res.status(400).json({ message: "Username is already in use" });
     }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     //const profile_pics = ["/", "", "/", "/"];
@@ -44,6 +50,8 @@ export async function signup(req, res) {
     return res.status(500).json({ message: "Internal server error" });
   }
 }
+
+//SIGNIN CONTROLLER
 
 export async function login(req, res) {
   try {
@@ -70,6 +78,7 @@ export async function login(req, res) {
   }
 }
 
+//LOGOUT CONTROLLER
 export async function logout(req, res) {
   try {
     res.clearCookie("jwt-archivex");
@@ -80,6 +89,7 @@ export async function logout(req, res) {
   }
 }
 
+//AUTH CHECK CONTROLLER
 export async function authCheck(req, res) {
   try {
     console.log("req.user:", req.user);
