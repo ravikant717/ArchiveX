@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 
-//Good practice for storing env keys in a seperate file
+//Good practice for storing env keys in a separate file
 export const ENV_VARS = {
   MONGO_URI: process.env.MONGO_URI,
   PORT: process.env.PORT || 5000,
