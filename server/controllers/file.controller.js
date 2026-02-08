@@ -39,9 +39,7 @@ export const uploadFile = async (req, res) => {
         });
       },
     );
-    //MY NOTES
-    //streamifier makes the file buffer into a readable stream
-    //pipe method makes the data flow from the readable stream into the writeable stream
+    // Stream the in-memory file buffer to Cloudinary via uploadStream
     streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
   } catch (err) {
     console.error("Upload error:", err);
