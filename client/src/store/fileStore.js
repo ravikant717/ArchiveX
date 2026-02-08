@@ -40,8 +40,9 @@ export const useFileStore = create((set) => ({
         responseType: 'blob',
       });
 
-      // Create a blob URL from the response
-      const blob = new Blob([response.data]);
+      // Create a blob URL from the response, preserving content type
+      const contentType = response.headers['content-type'] || 'application/octet-stream';
+      const blob = new Blob([response.data], { type: contentType });
       const blobUrl = URL.createObjectURL(blob);
 
       // Create a temporary anchor element to trigger download
@@ -53,10 +54,8 @@ export const useFileStore = create((set) => ({
       
       // Clean up
       link.remove();
-      // Revoke the blob URL after a short delay to ensure download starts
+      // Revoke blob URL after delay to allow browser to start download
       setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
-      
-      toast.success("Download started");
     } catch (err) {
       console.error("Download failed:", err);
       toast.error(getErrorMessage(err, "Download failed"));
