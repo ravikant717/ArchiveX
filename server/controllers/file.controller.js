@@ -2,7 +2,11 @@ import cloudinary from "../config/cloudinary.js";
 import axios from "axios";
 import path from "path";
 import streamifier from "streamifier";
+import { pipeline } from "stream";
+import { promisify } from "util";
 import { File } from "../models/file.model.js";
+
+const pipelineAsync = promisify(pipeline);
 
 /**
  * POST /upload
@@ -80,6 +84,7 @@ export const downloadFile = async (req, res) => {
     if (file.userId.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Unauthorized" });
     }
+
     const upstream = await axios.get(file.url, { responseType: "stream" });
     const safeName = (file.filename || "download")
       .replace(/"/g, "")
@@ -93,15 +98,25 @@ export const downloadFile = async (req, res) => {
       res.setHeader("Content-Length", upstream.headers["content-length"]);
     }
 
-    upstream.data.on("error", (streamErr) => {
-      console.error("Download stream error:", streamErr);
-      res.end();
+    // Handle client disconnection - abort upstream request to avoid socket leaks
+    const abortController = new AbortController();
+    res.on("close", () => {
+      if (!res.writableEnded) {
+        console.log("Client disconnected, aborting upstream request");
+        upstream.data.destroy();
+      }
     });
 
-    return upstream.data.pipe(res);
+    // Use pipeline for proper error handling and cleanup
+    await pipelineAsync(upstream.data, res);
   } catch (err) {
     console.error("downloadFile error:", err);
-    return res.status(500).json({ message: "Server error" });
+    // Only send error response if headers haven't been sent yet
+    if (!res.headersSent) {
+      return res.status(500).json({ message: "Server error" });
+    }
+    // If headers were already sent, just destroy the response stream
+    res.destroy();
   }
 };
 
