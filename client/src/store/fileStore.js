@@ -35,20 +35,31 @@ export const useFileStore = create((set) => ({
   },
   downloadFile: async (fileId, filename) => {
     try {
-      const downloadPath = `/api/v1/file/download/${fileId}`;
-      const baseUrl = api.defaults.baseURL || "";
-      const downloadUrl = baseUrl
-        ? new URL(downloadPath, baseUrl).toString()
-        : downloadPath;
+      // Use fetch to download file with proper error handling
+      const response = await api.get(`/api/v1/file/download/${fileId}`, {
+        responseType: 'blob',
+      });
 
-      const link = document.createElement("a"); //create anchor tag
-      link.href = downloadUrl;
-      link.rel = "noreferrer";
-      document.body.appendChild(link); //put the link in dom 
-      link.click(); //click the link 
-      link.remove(); //remove the link
+      // Create a blob URL from the response
+      const blob = new Blob([response.data]);
+      const blobUrl = URL.createObjectURL(blob);
+
+      // Create a temporary anchor element to trigger download
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename || "download";
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      link.remove();
+      // Revoke the blob URL after a short delay to ensure download starts
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+      
+      toast.success("Download started");
     } catch (err) {
       console.error("Download failed:", err);
+      toast.error(getErrorMessage(err, "Download failed"));
     }
   },
 
