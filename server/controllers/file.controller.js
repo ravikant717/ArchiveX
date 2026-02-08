@@ -12,37 +12,59 @@ export const uploadFile = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: "No file provided" });
     }
-    //Cloudinary makes a writeable stream
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        resource_type: "raw",
-        folder: `drive/${req.user._id}`,
-        use_filename: true,
-        unique_filename: false,
-      },
-      async (error, result) => {
-        if (error) {
-          console.error("Cloudinary error:", error);
-          return res.status(500).json({ message: "Cloudinary upload failed" });
-        }
 
-        const file = await File.create({
-          userId: req.user._id,
-          filename: req.file.originalname,
-          url: result.secure_url,
-          publicId: result.public_id,
-        });
+    // Wrap upload_stream in a Promise to properly handle async errors
+    const uploadPromise = new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: "raw",
+          folder: `drive/${req.user._id}`,
+          use_filename: true,
+          unique_filename: false,
+        },
+        async (error, result) => {
+          if (error) {
+            console.error("Cloudinary error:", error);
+            return reject(new Error("Cloudinary upload failed"));
+          }
 
-        return res.status(201).json({
-          success: true,
-          file,
-        });
-      },
-    );
-    //MY NOTES
-    //streamifier makes the file buffer into a readable stream
-    //pipe method makes the data flow from the readable stream into the writeable stream
-    streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+          try {
+            // Attempt to save file metadata to database
+            const file = await File.create({
+              userId: req.user._id,
+              filename: req.file.originalname,
+              url: result.secure_url,
+              publicId: result.public_id,
+            });
+
+            resolve(file);
+          } catch (dbError) {
+            console.error("Database error:", dbError);
+            // Clean up the Cloudinary upload if DB write fails
+            try {
+              await cloudinary.uploader.destroy(result.public_id, {
+                resource_type: "raw",
+              });
+              console.log("Cleaned up orphaned Cloudinary file:", result.public_id);
+            } catch (cleanupError) {
+              console.error("Failed to clean up Cloudinary file:", cleanupError);
+            }
+            reject(new Error("Database error while saving file"));
+          }
+        },
+      );
+
+      // Pipe the file buffer to the upload stream
+      streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+    });
+
+    // Await the upload and database save
+    const file = await uploadPromise;
+
+    return res.status(201).json({
+      success: true,
+      file,
+    });
   } catch (err) {
     console.error("Upload error:", err);
     return res.status(500).json({ message: "Server error" });
