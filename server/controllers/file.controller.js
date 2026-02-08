@@ -25,7 +25,7 @@ export const uploadFile = async (req, res) => {
         async (error, result) => {
           if (error) {
             console.error("Cloudinary error:", error);
-            return reject(new Error("Cloudinary upload failed"));
+            return reject(new Error(`Cloudinary upload failed: ${error.message || error}`));
           }
 
           try {
@@ -41,6 +41,7 @@ export const uploadFile = async (req, res) => {
           } catch (dbError) {
             console.error("Database error:", dbError);
             // Clean up the Cloudinary upload if DB write fails
+            let cleanupFailed = false;
             try {
               await cloudinary.uploader.destroy(result.public_id, {
                 resource_type: "raw",
@@ -48,8 +49,12 @@ export const uploadFile = async (req, res) => {
               console.log("Cleaned up orphaned Cloudinary file:", result.public_id);
             } catch (cleanupError) {
               console.error("Failed to clean up Cloudinary file:", cleanupError);
+              cleanupFailed = true;
             }
-            reject(new Error("Database error while saving file"));
+            const errorMsg = cleanupFailed
+              ? `Database error while saving file. Warning: Orphaned file may exist in Cloudinary (${result.public_id})`
+              : "Database error while saving file";
+            reject(new Error(errorMsg));
           }
         },
       );
