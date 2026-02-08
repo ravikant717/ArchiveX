@@ -51,9 +51,10 @@ export const uploadFile = async (req, res) => {
               console.error("Failed to clean up Cloudinary file:", cleanupError);
               cleanupFailed = true;
             }
+            const dbErrorMsg = dbError.message || "Unknown database error";
             const errorMsg = cleanupFailed
-              ? `Database error while saving file. Warning: Orphaned file may exist in Cloudinary (${result.public_id})`
-              : "Database error while saving file";
+              ? `Database error while saving file: ${dbErrorMsg}. Warning: Orphaned file may exist in Cloudinary (${result.public_id})`
+              : `Database error while saving file: ${dbErrorMsg}`;
             reject(new Error(errorMsg));
           }
         },
@@ -72,7 +73,7 @@ export const uploadFile = async (req, res) => {
     });
   } catch (err) {
     console.error("Upload error:", err);
-    return res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: err.message || "Server error" });
   }
 };
 
