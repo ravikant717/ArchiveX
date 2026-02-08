@@ -35,7 +35,7 @@ export const useFileStore = create((set) => ({
   },
   downloadFile: async (fileId, filename) => {
     try {
-      // Use fetch to download file with proper error handling
+      // Use axios to download file with proper error handling
       const response = await api.get(`/api/v1/file/download/${fileId}`, {
         responseType: 'blob',
       });
@@ -54,8 +54,9 @@ export const useFileStore = create((set) => ({
       
       // Clean up
       link.remove();
-      // Revoke blob URL after delay to allow browser to start download
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+      // Revoke blob URL after brief delay to allow browser to start download
+      const BLOB_REVOKE_DELAY_MS = 100;
+      setTimeout(() => URL.revokeObjectURL(blobUrl), BLOB_REVOKE_DELAY_MS);
     } catch (err) {
       console.error("Download failed:", err);
       toast.error(getErrorMessage(err, "Download failed"));
