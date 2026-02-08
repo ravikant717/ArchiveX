@@ -99,7 +99,6 @@ export const downloadFile = async (req, res) => {
     }
 
     // Handle client disconnection - abort upstream request to avoid socket leaks
-    const abortController = new AbortController();
     res.on("close", () => {
       if (!res.writableEnded) {
         console.log("Client disconnected, aborting upstream request");
