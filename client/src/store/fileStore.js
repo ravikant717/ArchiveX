@@ -43,9 +43,6 @@ export const useFileStore = create((set) => ({
 
       const link = document.createElement("a"); //create anchor tag
       link.href = downloadUrl;
-      if (filename) {
-        link.setAttribute("download", filename); //make the a tag only downloadable
-      }
       link.rel = "noreferrer";
       document.body.appendChild(link); //put the link in dom 
       link.click(); //click the link 
