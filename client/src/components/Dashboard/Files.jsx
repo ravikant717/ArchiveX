@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useFileStore } from "../../store/fileStore";
-import Zoom from "react-medium-image-zoom";
-import "react-medium-image-zoom/dist/styles.css";
 import FileMenu from "./FileMenu";
 
 const Files = () => {
@@ -14,17 +12,21 @@ const Files = () => {
   if (fetching) return <p>Loading files...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
+  const getExtension = (name) => {
+    const parts = name.split(".");
+    return parts.length > 1 ? parts.pop().toUpperCase() : "FILE";
+  };
+
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="max-h-[70vh] overflow-y-auto pr-2">
+      <div className="grid grid-cols-3 gap-4">
       {files.map((file) => (
         <div key={file._id} className="border p-3 rounded-xl">
-          <Zoom>
-            <img
-              src={file.url}
-              alt={file.filename}
-              className="w-full h-40 object-cover rounded-lg cursor-pointer"
-            />
-          </Zoom>
+          <div className="w-full h-40 rounded-lg bg-gray-100 flex items-center justify-center">
+            <span className="text-sm font-semibold text-gray-700">
+              {getExtension(file.filename)}
+            </span>
+          </div>
           <div className="flex relative items-center mt-2">
             <p className="w-[90%] text-center font-medium">{file.filename}</p>
             <div className="absolute right-0">
@@ -41,6 +43,7 @@ const Files = () => {
           </div>
         </div>
       ))}
+      </div>
     </div>
   );
 };

@@ -1,6 +1,9 @@
 import { create } from "zustand";
-import axios from "axios";
+import api from "../lib/api.js";
 import toast from "react-hot-toast";
+
+const getErrorMessage = (error, fallback) =>
+  error?.response?.data?.message || error?.message || fallback;
 
 export const useFileStore = create((set) => ({
   files: [],
@@ -14,7 +17,7 @@ export const useFileStore = create((set) => ({
       set({ uploading: true, error: null, successMsg: null });
       const formData = new FormData();
       formData.append("file", file);
-      const response = await axios.post("/api/v1/file/upload", formData);
+      const response = await api.post("/api/v1/file/upload", formData);
 
       set((state) => ({
         files: [response.data.file, ...state.files],
@@ -23,31 +26,30 @@ export const useFileStore = create((set) => ({
       }));
       toast.success("File uploaded successfully");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Upload error");
+      toast.error(getErrorMessage(error, "Upload error"));
       set({
         uploading: false,
-        error: error.response?.data?.message || "File Upload failed",
+        error: getErrorMessage(error, "File Upload failed"),
       });
     }
   },
   downloadFile: async (fileId, filename) => {
     try {
-      const response = await axios.get(
-        `/api/v1/file/download/${fileId}`,
-        {
-          responseType: "blob",
-        },
-        { withCredentials: true }
-      );
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", filename);
-      document.body.appendChild(link);
-      link.click();
+      const downloadPath = `/api/v1/file/download/${fileId}`;
+      const baseUrl = api.defaults.baseURL || "";
+      const downloadUrl = baseUrl
+        ? new URL(downloadPath, baseUrl).toString()
+        : downloadPath;
 
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      const link = document.createElement("a"); //create anchor tag
+      link.href = downloadUrl;
+      if (filename) {
+        link.setAttribute("download", filename); //make the a tag only downloadable
+      }
+      link.rel = "noreferrer";
+      document.body.appendChild(link); //put the link in dom 
+      link.click(); //click the link 
+      link.remove(); //remove the link
     } catch (err) {
       console.error("Download failed:", err);
     }
@@ -56,9 +58,7 @@ export const useFileStore = create((set) => ({
   fetchFiles: async () => {
     set({ fetching: true, error: null });
     try {
-      const res = await axios.get("/api/v1/file/my-files", {
-        withCredentials: true,
-      });
+      const res = await api.get("/api/v1/file/my-files");
 
       const data = res.data;
       set({ files: data.files || [], fetching: false });
@@ -66,18 +66,16 @@ export const useFileStore = create((set) => ({
       console.error("Error fetching files: ", err);
       set({
         fetching: false,
-        error: err.response?.data?.message || err.message || "Fetch failed",
+        error: getErrorMessage(err, "Fetch failed"),
       });
-      toast.error(err.response?.data?.message || "Failed to fetch files");
+      toast.error(getErrorMessage(err, "Failed to fetch files"));
     }
   },
   renameFile: async (fileId, filename) => {
     try {
-      const response = await axios.post(
-        `/api/v1/file/rename/${fileId}`,
-        { newFilename: filename },
-        { withCredentials: true }
-      );
+      const response = await api.post(`/api/v1/file/rename/${fileId}`, {
+        newFilename: filename,
+      });
 
       const updatedFile = response.data.file;
 
